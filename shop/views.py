@@ -46,3 +46,33 @@ class BrandUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
     permission_classes = [IsAdminUser]
+
+class ReviewsList(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        product_slug = self.kwargs.get('slug')
+
+        try:
+            product = Product.objects.get(slug=product_slug)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'محصول مورد نظر یافت نشد'})
+
+        return Review.objects.filter(is_approved=True, product=product)
+
+
+class ReviewsCreate(generics.CreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+
+        product_slug = self.kwargs.get('slug')
+        try:
+            product = Product.objects.get(slug=product_slug)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError({'detail': 'محصول مورد نظر یافت نشد'})
+
+        serializer.save(user=self.request.user, product=product)

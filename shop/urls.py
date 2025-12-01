@@ -26,4 +26,8 @@ urlpatterns = [
     path('brands/create/', views.BrandCreate.as_view(), name='brand-create'),
 
     path('brands/update-destroy/<slug:slug>/',views.BrandUpdateDestroy.as_view(), name='brand_detail_update_destroy'),
+
+    path('product/<slug:slug>/reviews', views.ReviewsList.as_view(), name='reviews'),
+
+    path('product/<slug:slug>/review/create', views.ReviewsCreate.as_view(), name='review_create')
 ]
