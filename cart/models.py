@@ -7,10 +7,11 @@ class Cart(models.Model):
     buyer = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
     def total_cart_price(self):
         total_cart = 0
         for item in self.cart_items.all():
-            total_cart += item.total_items_price()
+            total_cart += item.total_items_price
         return total_cart
 
     def __str__(self):
@@ -24,6 +25,7 @@ class CartItems(models.Model):
     class Meta:
         unique_together = ('cart', 'product')
 
+    @property
     def total_items_price(self):
         return self.product.price * self.quantity
 
