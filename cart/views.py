@@ -118,4 +118,20 @@ class UpdateCartView(generics.UpdateAPIView):
         serializer = self.get_serializer(cart_item)
         return Response(serializer.data)
 
+class RemoveCartItemsView(generics.DestroyAPIView):
+    serializer_class = CartItemsSerializers
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        cart = Cart.objects.get(buyer=self.request.user)
+        return CartItems.objects.filter(cart=cart)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+
+        return Response(
+            {'detail': 'محصول از سبد خرید شما حذف شد'},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
