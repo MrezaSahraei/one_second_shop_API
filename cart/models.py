@@ -8,7 +8,10 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def total_cart_price(self):
-        return sum(item.total_item_price for item in self.cart_items.all())
+        total_cart = 0
+        for item in self.cart_items.all():
+            total_cart += item.total_items_price()
+        return total_cart
 
     def __str__(self):
         return f'cart of {self.buyer.phone}'
@@ -21,7 +24,7 @@ class CartItems(models.Model):
     class Meta:
         unique_together = ('cart', 'product')
 
-    def total_item_price(self):
+    def total_items_price(self):
         return self.product.price * self.quantity
 
     def __str__(self):
