@@ -4,7 +4,8 @@ from shop.models import Product
 # Create your models here.
 
 class Cart(models.Model):
-    buyer = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart')
+    buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='carts', null=True)
+    session_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
@@ -15,7 +16,10 @@ class Cart(models.Model):
         return total_cart
 
     def __str__(self):
-        return f'cart of {self.buyer.phone}'
+        if self.buyer:
+            return f'cart of {self.buyer.phone}'
+        else:
+            return f'cart of anonymous user'
 
 class CartItems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items')

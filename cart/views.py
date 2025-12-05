@@ -1,33 +1,31 @@
-from django.contrib.auth import user_logged_in
-from django.core.serializers import serialize
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 from . models import Cart, CartItems, Product
 from .serializers import CartSerializer, CartItemsSerializers
 from rest_framework import status
 from django.db import transaction
+from .utils import get_or_create_cart
 # Create your views here.
 
 class CartRetrieveView(generics.RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = CartSerializer
 
     def get_object(self):
-        cart, created = Cart.objects.get_or_create(buyer=self.request.user)
+        cart, created = get_or_create_cart(self.request)
         return cart
 
 
 class AddToCartView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = CartItemsSerializers
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        cart, created = Cart.objects.get_or_create(buyer=request.user)
+        cart, created = get_or_create_cart(request)
         product_id = request.data.get('product_id')
         quantity = int(request.data.get('quantity', 1))
 
@@ -67,10 +65,10 @@ class AddToCartView(generics.CreateAPIView):
 
 class UpdateCartView(generics.UpdateAPIView):
     serializer_class = CartItemsSerializers
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
-        cart = Cart.objects.get(buyer=self.request.user)
+        cart, created = get_or_create_cart(self.request)
         return CartItems.objects.filter(cart=cart)
 
     @transaction.atomic
@@ -89,9 +87,6 @@ class UpdateCartView(generics.UpdateAPIView):
                 {'detail': 'مقدار باید عدد صحیح باشد'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        if not change_amount.is_integer():
-                return Response({'detail': 'مقدار تغییر باید عددی باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
         if change_amount > 10:
             return Response(
@@ -120,10 +115,10 @@ class UpdateCartView(generics.UpdateAPIView):
 
 class RemoveCartItemsView(generics.DestroyAPIView):
     serializer_class = CartItemsSerializers
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
-        cart = Cart.objects.get(buyer=self.request.user)
+        cart, created= get_or_create_cart(self.request)
         return CartItems.objects.filter(cart=cart)
 
     def destroy(self, request, *args, **kwargs):
@@ -135,3 +130,4 @@ class RemoveCartItemsView(generics.DestroyAPIView):
             status=status.HTTP_204_NO_CONTENT
         )
 
+#class MergeAnonymousUserCartView(APIView):
