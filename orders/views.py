@@ -60,4 +60,11 @@ class OrderCreateView(generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
 
+class BuyerOrdersListView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(orderer=self.request.user)
+
 

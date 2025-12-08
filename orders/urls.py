@@ -5,5 +5,8 @@ app_name = 'orders'
 from . import views
 urlpatterns = [
     path('create/', views.OrderCreateView.as_view(), name='create_order'),
+    path('list/', views.BuyerOrdersListView.as_view(), name='orders_list'),
+
+
 
 ]
