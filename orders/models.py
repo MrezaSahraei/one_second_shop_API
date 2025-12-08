@@ -17,6 +17,7 @@ class Order(models.Model):
         ('card', 'با کارت بانکی'),
     ]
     orderer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,related_name='orders', null=True)
+    phone = models.CharField(max_length=11)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     #final_amount = models.PositiveIntegerField(default=0)
@@ -29,8 +30,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_paid = models.BooleanField(default=False)
-    for_you = models.BooleanField(default=False)
-    discount_code = models.CharField(max_length=12, null=True)
+    for_me = models.BooleanField(default=False)
+    discount_code = models.CharField(max_length=12, null=True, blank=True)
 
     @property
     def final_order_price(self):
