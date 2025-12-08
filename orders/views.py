@@ -67,4 +67,9 @@ class BuyerOrdersListView(generics.ListAPIView):
     def get_queryset(self):
         return Order.objects.filter(orderer=self.request.user)
 
+class AdminsOrdersListView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAdminUser]
 
+    def get_queryset(self):
+        return Order.objects.all()

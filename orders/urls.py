@@ -8,5 +8,6 @@ urlpatterns = [
     path('list/', views.BuyerOrdersListView.as_view(), name='orders_list'),
 
 
-
+    #for admins or sellers
+    path('list/admin', views.AdminsOrdersListView.as_view(), name='orders_list_for_admins')
 ]
